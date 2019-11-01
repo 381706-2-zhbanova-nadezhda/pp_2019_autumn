@@ -59,7 +59,6 @@ int maxDiffMpi(std::vector<int> v) {
 
   // each process forms a vector that will process
   std::vector<int> v_proc(step + 1);
-  
   if (rank == 0) {
     // half interval used [..)
     v_proc = std::vector<int>(v.begin(), v.begin() + step + rest + 1);
