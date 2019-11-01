@@ -17,7 +17,7 @@ std::vector<int> randomInput(int size) {
   return vec;
 }
 
-// возвращает модуль наибольшей разницы соседних элементов
+// возвращает модуль наибольшей разницы соседних элементов 
 int maxDiff(std::vector<int> v) {
   int diff = 0;
   if (v.size() >= 2) {

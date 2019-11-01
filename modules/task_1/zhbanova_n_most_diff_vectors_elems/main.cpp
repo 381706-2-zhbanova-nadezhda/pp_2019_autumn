@@ -79,7 +79,7 @@ TEST(most_diff_vectors_elems, not_allowed_vector) {
   int num_of_elem = 1;
   std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  // заполнился только для 0 процесса
+  // заполнился только для 0 процесса 
   if (rank == 0) {
     v = randomInput(num_of_elem);
   }
