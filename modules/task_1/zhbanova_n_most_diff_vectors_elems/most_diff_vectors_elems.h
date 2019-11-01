@@ -6,8 +6,8 @@
 
 #include <vector>
 
-std::vector<int> randomInput(int size);  // создание вектора заданной с рандомными значениями
-int maxDiff(std::vector<int> v);  // обычный вариант
-int maxDiffMpi(std::vector<int> v);  // с использованием MPI 
+std::vector<int> randomInput(int size);
+int maxDiff(std::vector<int> v);
+int maxDiffMpi(std::vector<int> v);
 
 #endif  // MODULES_TASK_1_ZHBANOVA_N_MOST_DIFF_VECTORS_ELEMS_MOST_DIFF_VECTORS_ELEMS_H_
