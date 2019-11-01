@@ -1,17 +1,15 @@
-// main.cpp: определяет точку входа для консольного приложения.
-//
+// Copyright 2019 Zhbanova Nadezhda
+
 #include <gtest-mpi-listener.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 #include <iostream>
 #include "./most_diff_vectors_elems.h"
 
-using namespace std;
-
 TEST(most_diff_vectors_elems, min_vector) {
   int rank;
   int num_of_elem = 2;
-  vector<int> v(num_of_elem);
+  std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
@@ -28,7 +26,7 @@ TEST(most_diff_vectors_elems, min_vector) {
 TEST(most_diff_vectors_elems, small_vector) {
   int rank;
   int num_of_elem = 7;
-  vector<int> v(num_of_elem);
+  std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
@@ -45,7 +43,7 @@ TEST(most_diff_vectors_elems, small_vector) {
 TEST(most_diff_vectors_elems, medium_vector) {
   int rank;
   int num_of_elem = 100;
-  vector<int> v(num_of_elem);
+  std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
@@ -62,7 +60,7 @@ TEST(most_diff_vectors_elems, medium_vector) {
 TEST(most_diff_vectors_elems, big_vector) {
   int rank;
   int num_of_elem = 500;
-  vector<int> v(num_of_elem);
+  std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
@@ -79,9 +77,9 @@ TEST(most_diff_vectors_elems, big_vector) {
 TEST(most_diff_vectors_elems, not_allowed_vector) {
   int rank;
   int num_of_elem = 1;
-  vector<int> v(num_of_elem);
+  std::vector<int> v(num_of_elem);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  //заполнился только для 0 процесса
+  // заполнился только для 0 процесса
   if (rank == 0) {
     v = randomInput(num_of_elem);
   }
@@ -103,4 +101,5 @@ int main(int argc, char** argv) {
   listeners.Append(new GTestMPIListener::MPIMinimalistPrinter);
   return RUN_ALL_TESTS();
 }
+
 
