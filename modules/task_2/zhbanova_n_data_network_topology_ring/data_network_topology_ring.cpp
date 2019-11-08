@@ -31,7 +31,7 @@ std::vector<int> transferDataToCheck(int rank, int rankFrom, int rankTo, std::ve
   }
 
   if (rank == rankFrom) {
-    resultVec.resize(VEC_SIZE);   //  FOR WHAT?
+    resultVec.resize(VEC_SIZE);
     MPI_Status status;   // received message parameter
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
   }
