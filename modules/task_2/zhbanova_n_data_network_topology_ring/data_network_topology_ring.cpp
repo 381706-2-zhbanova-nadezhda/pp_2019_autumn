@@ -1,11 +1,11 @@
 // Copyright 2019 Zhbanova Nadezhda
 
 #include <iostream>
+#include <stdio.h>
 #include <vector>
 #include <random>
 #include <cmath>
 #include <ctime>
-#include <stdio.h>
 #include <windows.h>
 #include "../../../modules/task_2/zhbanova_n_data_network_topology_ring/data_network_topology_ring.h"
 #include "./mpi.h"
@@ -70,7 +70,7 @@ std::vector<int> sendVector(int rankFrom, int rankTo, std::vector<int> vec) {
     resultVec = recvFromRing(rank, size);
     sendByRing(resultVec, rank, size);
   } else if (rankFrom > rankTo  && ((rank > rankFrom && rank < size) || (rank < rankTo))) {
-	//  ..-> 0 proc ->.., when rankFrom > rankTo
+    //  ..-> 0 proc ->.., when rankFrom > rankTo
     resultVec = recvFromRing(rank, size);
     sendByRing(resultVec, rank, size);
   }

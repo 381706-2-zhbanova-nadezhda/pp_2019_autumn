@@ -74,8 +74,7 @@ TEST(data_network_topology_ring, sendFromFirstToLast) {   // all processes are i
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -102,8 +101,7 @@ TEST(data_network_topology_ring, sendVia0Proc) {   // all processes are involved
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -130,8 +128,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromLessTo) {
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -156,14 +153,13 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromMoreTo) {
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
 }
 
-/************************способ 2****************************/
+/************************way 2****************************/
 TEST(data_network_topology_ring_2, exceptionIfRankToLessThanZero) {
   std::vector<int> vec;
   int rankTo = -1;
@@ -218,8 +214,7 @@ TEST(data_network_topology_ring_2, sendFromFirstToLast) {   // all processes are
     MPI_Status status;   // received message parameter
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
 
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -242,16 +237,14 @@ TEST(data_network_topology_ring_2, sendVia0Proc) {   // all processes are involv
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
   } else {
     vec = transferVector2(rankFrom, rankTo);
-    if (rank == rankTo)
-    {
+    if (rank == rankTo) {
       MPI_Send(&vec[0], vec.size(), MPI_INT, rankFrom, 0, MPI_COMM_WORLD);
     }
   }
 
   // check data
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -270,20 +263,18 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromLessTo) {
     vec = randomInputVector(VEC_SIZE);
     sendVector2(rankTo, vec);
 
-    MPI_Status status; // параметр принятого сообщения
+    MPI_Status status;
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
   } else {
     vec = transferVector2(rankFrom, rankTo);
-    if (rank == rankTo)
-    {
+    if (rank == rankTo) {
       MPI_Send(&vec[0], vec.size(), MPI_INT, rankFrom, 0, MPI_COMM_WORLD);
     }
   }
 
   // check data
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -302,20 +293,18 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromMoreTo) {
     vec = randomInputVector(VEC_SIZE);
     sendVector2(rankTo, vec);
 
-    MPI_Status status; // параметр принятого сообщения
+    MPI_Status status;
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
   } else {
     vec = transferVector2(rankFrom, rankTo);
-    if (rank == rankTo)
-    {
+    if (rank == rankTo) {
       MPI_Send(&vec[0], vec.size(), MPI_INT, rankFrom, 0, MPI_COMM_WORLD);
     }
   }
 
   // check data
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++)
-    {
+    for (int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
