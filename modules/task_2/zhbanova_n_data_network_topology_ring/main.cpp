@@ -2,6 +2,7 @@
 
 #include <gtest-mpi-listener.hpp>
 #include <gtest/gtest.h>
+#include <vector>
 #include <iostream>
 #include "./data_network_topology_ring.h"
 
@@ -63,8 +64,7 @@ TEST(data_network_topology_ring, sendFromFirstToLast) {   // all processes are i
 
   int rankTo = size - 1;
 
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     vec = randomInputVector(VEC_SIZE);
   }
 
@@ -73,8 +73,7 @@ TEST(data_network_topology_ring, sendFromFirstToLast) {   // all processes are i
 
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -93,8 +92,7 @@ TEST(data_network_topology_ring, sendVia0Proc) {   // all processes are involved
   int rankFrom = size / 2;
   int rankTo = rankFrom - 1;
 
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     vec = randomInputVector(VEC_SIZE);
   }
 
@@ -103,8 +101,7 @@ TEST(data_network_topology_ring, sendVia0Proc) {   // all processes are involved
 
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -123,8 +120,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromLessTo) {
   int rankFrom = 0;
   int rankTo = size/2;
 
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     vec = randomInputVector(VEC_SIZE);
   }
 
@@ -133,8 +129,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromLessTo) {
 
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -151,8 +146,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromMoreTo) {
   int rankFrom = size - 1;
   int rankTo = 0;
 
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     vec = randomInputVector(VEC_SIZE);
   }
 
@@ -161,8 +155,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromMoreTo) {
 
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -205,27 +198,23 @@ TEST(data_network_topology_ring_2, sendFromFirstToLast) {   // all processes are
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     rankTo = size - 1;
     vec = randomInputVector(VEC_SIZE);
   }
 
   // execute
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     sendVector2(rankTo, vec);
   } else {
     vec = transferVector2(rankFrom, rankTo);
   }
 
   // check result
-  if (rank == rankTo)
-  {
+  if (rank == rankTo) {
     MPI_Send(&vec[0], vec.size(), MPI_INT, rankFrom, 0, MPI_COMM_WORLD);
   }
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     MPI_Status status;   // received message parameter
     MPI_Recv(&resultVec[0], VEC_SIZE, MPI_INT, rankTo, 0, MPI_COMM_WORLD, &status);
 
@@ -244,8 +233,7 @@ TEST(data_network_topology_ring_2, sendVia0Proc) {   // all processes are involv
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   int rankFrom = size/2;
   int rankTo;
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     rankTo = rankFrom - 1;
     vec = randomInputVector(VEC_SIZE);
     sendVector2(rankTo, vec);
@@ -261,8 +249,7 @@ TEST(data_network_topology_ring_2, sendVia0Proc) {   // all processes are involv
   }
 
   // check data
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -278,8 +265,7 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromLessTo) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   int rankFrom = 0;
   int rankTo;
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     rankTo = size / 2;
     vec = randomInputVector(VEC_SIZE);
     sendVector2(rankTo, vec);
@@ -295,8 +281,7 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromLessTo) {
   }
 
   // check data
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);
@@ -312,8 +297,7 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromMoreTo) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   int rankFrom = size - 1;
   int rankTo;
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     rankTo = 0;
     vec = randomInputVector(VEC_SIZE);
     sendVector2(rankTo, vec);
@@ -329,8 +313,7 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromMoreTo) {
   }
 
   // check data
-  if (rank == rankFrom)
-  {
+  if (rank == rankFrom) {
     for (int i = 0; i < resultVec.size(); i++)
     {
       ASSERT_EQ(resultVec[i], vec[i]);

@@ -1,8 +1,8 @@
 // Copyright 2019 Zhbanova Nadezhda
 
+#include <iostream>
 #include <vector>
 #include <random>
-#include <iostream>
 #include <cmath>
 #include <ctime>
 #include <stdio.h>
@@ -69,8 +69,8 @@ std::vector<int> sendVector(int rankFrom, int rankTo, std::vector<int> vec) {
   } else if (rankFrom < rankTo && rank > rankFrom && rank < rankTo) {   // 0 proc ->..-> N proc, when rankFrom < rankTo
     resultVec = recvFromRing(rank, size);
     sendByRing(resultVec, rank, size);
-  }
-  else if (rankFrom > rankTo  && ((rank > rankFrom && rank < size ) || (rank < rankTo))) {   //  ..-> 0 proc ->.., when rankFrom > rankTo
+  } else if (rankFrom > rankTo  && ((rank > rankFrom && rank < size) || (rank < rankTo))) {
+	//  ..-> 0 proc ->.., when rankFrom > rankTo
     resultVec = recvFromRing(rank, size);
     sendByRing(resultVec, rank, size);
   }
@@ -95,7 +95,7 @@ std::vector<int> recvFromRing(int rank, int size) {
   int vecSize;
   std::vector<int> vec;
   MPI_Status status;   // received message parameter
-  // (rank - 1 + size) % size - номер процесса-отправителя
+  // (rank - 1 + size) % size - sender process number
   MPI_Recv(buff, MAX_BUFF_SIZE, MPI_PACKED, (rank - 1 + size) % size, 0, MPI_COMM_WORLD, &status);
   MPI_Unpack(buff, MAX_BUFF_SIZE, &pos, &vecSize, 1, MPI_INT, MPI_COMM_WORLD);
   vec.resize(vecSize);
@@ -104,7 +104,7 @@ std::vector<int> recvFromRing(int rank, int size) {
   return vec;
 }
 
-/************2 способ*************/
+/************2 way*************/
 
 void sendVector2(int rankTo, std::vector<int> vec) {   // this function is used only by the sender process
   int rank;
