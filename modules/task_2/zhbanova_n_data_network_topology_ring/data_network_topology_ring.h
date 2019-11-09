@@ -17,9 +17,9 @@ void sendByRing(std::vector<int> vec, int rank, int size);
 std::vector<int> recvFromRing(int rank, int size);
 
 // 2 way - only the process sender knows the process recipient, initially
-void sendVector2(int rankTo, std::vector<int> vec);
-std::vector<int> transferVector2(int& rankFrom, int& rankTo);
-void sendByRing2(std::vector<int> vec, int rank, int rankFrom, int rankTo, int size);
-std::vector<int> recvFromRing2(int rank, int size, int& rankFrom, int& rankTo);
+// void sendVector2(int rankTo, std::vector<int> vec);
+// std::vector<int> transferVector2(int& rankFrom, int& rankTo);
+// void sendByRing2(std::vector<int> vec, int rank, int rankFrom, int rankTo, int size);
+// std::vector<int> recvFromRing2(int rank, int size, int& rankFrom, int& rankTo);
 
 #endif  // MODULES_TASK_2_ZHBANOVA_N_DATA_NETWORK_TOPOLOGY_RING_DATA_NETWORK_TOPOLOGY_RING_H_

@@ -1,12 +1,12 @@
 // Copyright 2019 Zhbanova Nadezhda
 
-#include <iostream>
-#include <stdio.h>
-#include <vector>
-#include <random>
-#include <cmath>
-#include <ctime>
 #include <windows.h>
+#include <ctime>
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include <random>
+#include <stdio.h>
 #include "../../../modules/task_2/zhbanova_n_data_network_topology_ring/data_network_topology_ring.h"
 #include "./mpi.h"
 
@@ -105,7 +105,7 @@ std::vector<int> recvFromRing(int rank, int size) {
 }
 
 /************2 way*************/
-
+/*
 void sendVector2(int rankTo, std::vector<int> vec) {   // this function is used only by the sender process
   int rank;
   int size;
@@ -184,5 +184,5 @@ std::vector<int> recvFromRing2(int rank, int size, int& rankFrom, int& rankTo) {
   }
   // std::cout << "DEBUG2: " << rank << " has recieved data from " << (rank - 1 + size) % size << std::endl;
   return vec;
-}
+} */
 

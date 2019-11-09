@@ -160,6 +160,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromMoreTo) {
 }
 
 /************************way 2****************************/
+/*
 TEST(data_network_topology_ring_2, exceptionIfRankToLessThanZero) {
   std::vector<int> vec;
   int rankTo = -1;
@@ -309,7 +310,7 @@ TEST(data_network_topology_ring_2, sendViaNotAllProcFromMoreTo) {
     }
   }
 }
-
+*/
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   MPI_Init(&argc, &argv);
