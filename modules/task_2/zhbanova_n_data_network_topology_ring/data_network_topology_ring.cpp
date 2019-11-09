@@ -1,12 +1,12 @@
 // Copyright 2019 Zhbanova Nadezhda
 
 #include <windows.h>
+#include <stdio.h>
 #include <ctime>
 #include <vector>
 #include <iostream>
 #include <cmath>
 #include <random>
-#include <stdio.h>
 #include "../../../modules/task_2/zhbanova_n_data_network_topology_ring/data_network_topology_ring.h"
 #include "./mpi.h"
 
