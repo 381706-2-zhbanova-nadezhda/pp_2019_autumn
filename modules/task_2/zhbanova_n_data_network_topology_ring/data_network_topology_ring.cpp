@@ -1,6 +1,6 @@
 // Copyright 2019 Zhbanova Nadezhda
 
-#include <windows.h>
+// #include <windows.h>
 #include <stdio.h>
 #include <ctime>
 #include <vector>
