@@ -74,7 +74,7 @@ TEST(data_network_topology_ring, sendFromFirstToLast) {   // all processes are i
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++) {
+    for (unsigned int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -101,7 +101,7 @@ TEST(data_network_topology_ring, sendVia0Proc) {   // all processes are involved
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++) {
+    for (unsigned int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -128,7 +128,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromLessTo) {
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++) {
+    for (unsigned int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
@@ -153,7 +153,7 @@ TEST(data_network_topology_ring, sendViaNotAllProcFromMoreTo) {
   // check data
   resultVec = transferDataToCheck(rank, rankFrom, rankTo, resultVec);
   if (rank == rankFrom) {
-    for (int i = 0; i < resultVec.size(); i++) {
+    for (unsigned int i = 0; i < resultVec.size(); i++) {
       ASSERT_EQ(resultVec[i], vec[i]);
     }
   }
