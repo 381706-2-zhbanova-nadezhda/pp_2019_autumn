@@ -181,100 +181,102 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
 
   if (N <= 64) {
     return matr_Rez_Par = Strassen_alg(matr_A, matr_B, N);
-  }
-  if (rank == 0) {
-    matr_Rez_Par = MemoryVectorMatrix(N);
-    //  Memory allocation for auxiliary matrices and partitioning of matrices into blocks
-    sqr = sqrt(size), new_N = N / sqr;
-    A = new double* [size], B = new double* [size];
-    for (int i = 0; i < size; i++) {
-      A[i] = MemoryVectorMatrix(new_N);
-      B[i] = MemoryVectorMatrix(new_N);
-    }
-    for (int i = 0; i < N; i++)
-      for (int j = 0; j < N; j++) {
-        A[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_A[i * N + j];
-        B[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_B[i * N + j];
+  } else {
+    if (rank == 0) {
+      matr_Rez_Par = MemoryVectorMatrix(N);
+      //  Memory allocation for auxiliary matrices and partitioning of matrices into blocks
+      sqr = sqrt(size), new_N = N / sqr;
+      A = new double* [size], B = new double* [size];
+      for (int i = 0; i < size; i++) {
+        A[i] = MemoryVectorMatrix(new_N);
+        B[i] = MemoryVectorMatrix(new_N);
       }
-    //  Distribution of data to other processes
-    MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    for (int i = 1; i < size; i++) {
-      int coef_A = sqr * (i / sqr), coef_B = i % sqr;
-      for (int j = 0; j < sqr; j++) {
-        MPI_Send(A[coef_A], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-        MPI_Send(B[coef_B], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-        coef_A++;
-        coef_B += sqr;
+      for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++) {
+          A[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_A[i * N + j];
+          B[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_B[i * N + j];
+        }
+      //  Distribution of data to other processes
+      MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      for (int i = 1; i < size; i++) {
+        int coef_A = sqr * (i / sqr), coef_B = i % sqr;
+        for (int j = 0; j < sqr; j++) {
+          MPI_Send(A[coef_A], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+          MPI_Send(B[coef_B], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+          coef_A++;
+          coef_B += sqr;
+        }
+      }
+      //  Swap pointers for tedious computing
+      for (int i = 0; i < sqr; i++) {
+        double* TMP = B[i];
+        B[i] = B[i * sqr];
+        B[i * sqr] = TMP;
       }
     }
-    //  Swap pointers for tedious computing
-    for (int i = 0; i < sqr; i++) {
-      double* TMP = B[i];
-      B[i] = B[i * sqr];
-      B[i * sqr] = TMP;
-    }
-  }
-  //  Receiving data from the root process and generating the necessary data
-  if (size != 0) {
-    MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    sqr = sqrt(size), new_N = N / sqr;
-    A = new double* [sqr], B = new double* [sqr];
-    for (int i = 0; i < sqr; i++) {
-      A[i] = MemoryVectorMatrix(new_N);
-      B[i] = MemoryVectorMatrix(new_N);
-    }
-    for (int i = 0; i < sqr; i++) {
+    //  Receiving data from the root process and generating the necessary data
+    if (size != 0) {
+      MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      sqr = sqrt(size), new_N = N / sqr;
+      A = new double* [sqr], B = new double* [sqr];
+      for (int i = 0; i < sqr; i++) {
+        A[i] = MemoryVectorMatrix(new_N);
+        B[i] = MemoryVectorMatrix(new_N);
+      }
+      for (int i = 0; i < sqr; i++) {
       MPI_Recv(A[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
       MPI_Recv(B[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
+      }
     }
-  }
-  //  each process calculating its piece of matrix
-  TMP_Rez = new double* [sqr+1];
-  for (int i = 0; i < sqr; i++) {
-    TMP_Rez[i + 1] = Strassen_alg(A[i], B[i], new_N);
-  }
-  if (size == 4)
-    TMP_Rez[0] = Add2(TMP_Rez[1], TMP_Rez[2], new_N);
-  if (size == 16)
-    TMP_Rez[0] = Add4(TMP_Rez[1], TMP_Rez[2], TMP_Rez[3], TMP_Rez[4], new_N);
-  //  Free up auxiliary memory
-  if (rank == 0) {
-    for (int i = 0; i < size; i++) {
-      delete[] A[i];
-      delete[] B[i];
-    }
-  } else {
+    //  each process calculating its piece of matrix
+    TMP_Rez = new double* [sqr + 1];
     for (int i = 0; i < sqr; i++) {
-      delete[] A[i];
-      delete[] B[i];
+      TMP_Rez[i + 1] = Strassen_alg(A[i], B[i], new_N);
     }
-  }
-  for (int i = 1; i < sqr + 1; i++) {
-    delete[] TMP_Rez[i];
-  }
-  delete[] A;
-  delete[] B;
-  //  Sending result to 0 process
-  if (rank != 0) {
-    MPI_Send(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-    delete[] TMP_Rez[0];
-  }
-  if (rank == 0) {
-    int coef = sqrt(size);
-    //  write down the result of our work
-    for (int i = 0; i < new_N; i++)
-      for (int j = 0; j < new_N; j++)
-        matr_Rez_Par[coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
-    for (int k = 1; k < size; k++) {
-      //  accept and record the results of other processes
-      MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
+    if (size == 4)
+      TMP_Rez[0] = Add2(TMP_Rez[1], TMP_Rez[2], new_N);
+    if (size == 16)
+      TMP_Rez[0] = Add4(TMP_Rez[1], TMP_Rez[2], TMP_Rez[3], TMP_Rez[4], new_N);
+    //  Free up auxiliary memory
+    if (rank == 0) {
+      for (int i = 0; i < size; i++) {
+        delete[] A[i];
+        delete[] B[i];
+      }
+    } else {
+      for (int i = 0; i < sqr; i++) {
+        delete[] A[i];
+        delete[] B[i];
+      }
+    }
+    for (int i = 1; i < sqr + 1; i++) {
+      delete[] TMP_Rez[i];
+    }
+    delete[] A;
+    delete[] B;
+    //  Sending result to 0 process
+    if (rank != 0) {
+      MPI_Send(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+      delete[] TMP_Rez[0];
+    }
+    if (rank == 0) {
+      int coef = sqrt(size);
+      //  write down the result of our work
       for (int i = 0; i < new_N; i++)
         for (int j = 0; j < new_N; j++)
-          matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+          matr_Rez_Par[coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+      for (int k = 1; k < size; k++) {
+        //  accept and record the results of other processes
+        MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
+        for (int i = 0; i < new_N; i++)
+          for (int j = 0; j < new_N; j++)
+            matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+      }
+      return matr_Rez_Par;
+      delete[] TMP_Rez[0];
+      delete[] matr_Rez_Par;
     }
-    return matr_Rez_Par;
-    delete[] TMP_Rez[0];
-    delete[] matr_Rez_Par;
+    delete[] TMP_Rez;
   }
-  delete[] TMP_Rez;
+  return matr_Rez_Par;
 }
