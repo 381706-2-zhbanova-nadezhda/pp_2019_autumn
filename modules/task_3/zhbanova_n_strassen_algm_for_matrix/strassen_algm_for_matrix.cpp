@@ -1,8 +1,8 @@
 // Copyright 2019 Zhbanova Nadezhda
 
-#include <iostream>
 #include "../../../modules/task_3/zhbanova_n_strassen_algm_for_matrix/strassen_algm_for_matrix.h"
 #include "./mpi.h"
+#include <iostream>
 #include <math.h>
 #include <time.h>
 
@@ -16,7 +16,7 @@ void RandMatrix(double* matrix1, int N) {
   srand(time(0));
   for (int i = 0; i < N; i++)
     for (int j = 0; j < N; j++) {
-      matrix1[i * N + j] = rand() % 10 + 0.5;
+      matrix1[i * N + j] = (rand() % 10) + 0.5;
     }
 }
 
@@ -86,13 +86,13 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
     double* C[4];
     double* P[7];
 
-    /*Выделяем память под вспомогательные матрицы*/
+    //  Allocate memory for auxiliary matrices
     for (int i = 0; i < 4; i++) {
       A[i] = MemoryVectorMatrix(N);
       B[i] = MemoryVectorMatrix(N);
     }
 
-    /*Разбиваем матрицы на 4 блока*/
+    //  We break matrixes into 4 blocks
     for (int i = 0; i < N; i++)
       for (int j = 0; j < N; j++) {
         int index_new = i * N + j, index_old = 2 * i * N + j, N_N = 2 * N * N;
@@ -107,7 +107,7 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
         B[3][index_new] = matrix2[index_old + N_N + N];
       }
 
-    /*Выполняем умножения 7 шт(рекурсивно)*/
+    //  We carry out multiplications of 7 pieces (recursively)
     double* TMP = Add2(A[0], A[3], N);
     double* _TMP = Add2(B[0], B[3], N);
     P[0] = Strassen_alg(TMP, _TMP, N);
@@ -142,12 +142,12 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
     delete[] TMP;
     delete[] _TMP;
 
-    /*Находим результирующие значения(блоки)*/
+    //  Find the resulting values (blocks)
     C[0] = Add3Sub1(P[0], P[3], P[6], P[4], N);
     C[1] = Add2(P[2], P[4], N);
     C[2] = Add2(P[1], P[3], N);
     C[3] = Add3Sub1(P[0], P[2], P[5], P[1], N);
-    /*Формируем результирующую матрицу*/
+    //  We form the resulting matrix
     for (int i = 0; i < N; i++)
       for (int j = 0; j < N; j++) {
         Rez[i * 2 * N + j] = C[0][i * N + j];
@@ -156,7 +156,7 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
         Rez[i * 2 * N + j + 2 * N * N + N] = C[3][i * N + j];
       }
 
-    /*Освобождаем выделенную память*/
+    //  Releasing Allocated Memory
     for (int i = 0; i < 4; i++) {
       delete[] A[i];
       delete[] B[i];
@@ -181,8 +181,8 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
   }
   if (rank == 0) {
     matr_Rez_Par = MemoryVectorMatrix(N);
-    //  Выделение памяти под вспомогательные матрицы и разбиение матриц на блоки
-    sqr = (int)sqrt((double)size), new_N = N / sqr;
+    //  Memory allocation for auxiliary matrices and partitioning of matrices into blocks
+    sqr = sqrt(size), new_N = N / sqr;
     A = new double* [size], B = new double* [size];
     for (int i = 0; i < size; i++) {
       A[i] = MemoryVectorMatrix(new_N);
@@ -193,7 +193,7 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
         A[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_A[i * N + j];
         B[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_B[i * N + j];
       }
-    //  Рассылка данных другим процессам
+    //  Distribution of data to other processes
     MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
     for (int i = 1; i < size; i++) {
       int coef_A = sqr * (i / sqr), coef_B = i % sqr;
@@ -204,17 +204,17 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
         coef_B += sqr;
       }
     }
-    //  Swap указателей для однообразных вычислений
+    //  Swap pointers for tedious computing
     for (int i = 0; i < sqr; i++) {
       double* TMP = B[i];
       B[i] = B[i * sqr];
       B[i * sqr] = TMP;
     }
   }
-  //  Прием данных от процесса-root и формировка нужных данных
+  //  Receiving data from the root process and generating the necessary data
   if (size != 0) {
     MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    sqr = (int)sqrt((double)size), new_N = N / sqr;
+    sqr = sqrt(size), new_N = N / sqr;
     A = new double* [sqr], B = new double* [sqr];
     for (int i = 0; i < sqr; i++) {
       A[i] = MemoryVectorMatrix(new_N);
@@ -225,16 +225,16 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
       MPI_Recv(B[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
     }
   }
-  //  вычисление каждым процессом своего куска матрицы
+  //  each process calculating its piece of matrix
   TMP_Rez = new double* [sqr+1];
-  for ( int i = 0; i < sqr; i++) {
+  for (int i = 0; i < sqr; i++) {
     TMP_Rez[i + 1] = Strassen_alg(A[i], B[i], new_N);
   }
   if (size == 4)
     TMP_Rez[0] = Add2(TMP_Rez[1], TMP_Rez[2], new_N);
   if (size == 16)
     TMP_Rez[0] = Add4(TMP_Rez[1], TMP_Rez[2], TMP_Rez[3], TMP_Rez[4], new_N);
-  //  Освобождение вспомогательной памяти
+  //  Free up auxiliary memory
   if (rank == 0) {
     for (int i = 0; i < size; i++) {
       delete[] A[i];
@@ -251,19 +251,19 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
   }
   delete[] A;
   delete[] B;
-  //  Отправка результата на 0 процесс
+  //  Sending result to 0 process
   if (rank != 0) {
     MPI_Send(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     delete[] TMP_Rez[0];
   }
   if (rank == 0) {
-    int coef = (int)sqrt((double)size);
-    //  записываем результат совей работы
+    int coef = sqrt(size);
+    //  write down the result of our work
     for (int i = 0; i < new_N; i++)
       for (int j = 0; j < new_N; j++)
         matr_Rez_Par[coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
     for (int k = 1; k < size; k++) {
-      //  принимаем и записываем результаты работы других процессов
+      //  accept and record the results of other processes
       MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
       for (int i = 0; i < new_N; i++)
         for (int j = 0; j < new_N; j++)
