@@ -2,7 +2,7 @@
 #ifndef MODULES_TASK_3_ZHBANOVA_N_STRASSEN_ALGM_FOR_MATRIX_STRASSEN_ALGM_FOR_MATRIX_H_
 #define MODULES_TASK_3_ZHBANOVA_N_STRASSEN_ALGM_FOR_MATRIX_STRASSEN_ALGM_FOR_MATRIX_H_
 
-// Copyright 2019 Zhbanova Nadezhda
+// Copyright 2019 Zhbanova Nadezhda 
 
 double* MemoryVectorMatrix(int N);
 void RandMatrix(double* matrix1, int N);

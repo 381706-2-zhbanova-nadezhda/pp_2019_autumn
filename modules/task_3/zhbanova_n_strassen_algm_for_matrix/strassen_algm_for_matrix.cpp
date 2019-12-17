@@ -219,7 +219,7 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
 			B[i * sqr] = TMP;
 		}
 	}
-	/*Прием данных от процесса-root и формировка нужных данных*/
+	/*Прием данных от процесса-root и формировка нужных данных */
 	if (size != 0) {
 		MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
 		sqr = (int)sqrt((double)size), new_N = N / sqr;

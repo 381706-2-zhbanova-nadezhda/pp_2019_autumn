@@ -46,7 +46,7 @@ TEST(strassen_algm_for_matrix, check_Strassen_algorithm) {
   }
 }
 
-TEST(strassen_algm_for_matrix, check_Strassen_alg_parall) {
+TEST(strassen_algm_for_matrix, check_Strassen_alg_parall)  {
 	int rank, size;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
