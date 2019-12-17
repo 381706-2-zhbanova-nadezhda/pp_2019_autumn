@@ -270,7 +270,8 @@ double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
         MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
         for (int i = 0; i < new_N; i++)
           for (int j = 0; j < new_N; j++)
-            matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+            matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] 
+              = TMP_Rez[0][i * new_N + j];
       }
       return matr_Rez_Par;
       delete[] TMP_Rez[0];
