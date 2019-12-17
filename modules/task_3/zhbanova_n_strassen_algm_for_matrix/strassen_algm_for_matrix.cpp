@@ -17,17 +17,19 @@ double* MemoryVectorMatrix(int N) {
 void RandMatrix(double* matrix1, int N) {
   std::random_device rnd_device;
   std::mt19937 mersenne_engine(rnd_device());
-  for (int i = 0; i < N; i++)
+  for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       matrix1[i * N + j] = mersenne_engine() % 10 + 0.5;
     }
+  }
 }
 
 void PrintMatrix(double* matrix, int N) {
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++)
+    for (int j = 0; j < N; j++) {
       std::cout << matrix[i * N + j] << " ";
-      std::cout << std::endl;
+    }
+    std::cout << std::endl;
   }
   std::cout << std::endl;
 }
