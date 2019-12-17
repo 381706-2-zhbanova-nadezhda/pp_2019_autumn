@@ -16,9 +16,9 @@ TEST(strassen_algm_for_matrix, check_Trivial_alghorithm) {
 
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
-        matr_c[i * N + j] = (((double)i + 1) * 10);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
+        matr_c[i * N + j] = (i + 1) * 10;
       }
     }
     double* matr_trivial = Trivial_alghorithm(matr_a, matr_b, N);
@@ -56,8 +56,8 @@ TEST(strassen_algm_for_matrix, check_Strassen_alg_parall) {
     double* matr_b = MemoryVectorMatrix(N);
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
       }
     }
     double* matr_trivial = Trivial_alghorithm(matr_a, matr_b, N);
@@ -79,9 +79,9 @@ TEST(strassen_algm_for_matrix, check_func_Add_two_matrix) {
 
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
-        matr_c[i * N + j] = (((double)i + 1) *2);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
+        matr_c[i * N + j] = (i + 1) *2;
       }
     }
     double* matr_add2 = Add2(matr_a, matr_b, N);
@@ -102,9 +102,9 @@ TEST(strassen_algm_for_matrix, check_func_Add_four_matrix) {
 
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
-        matr_c[i * N + j] = (((double)i + 1) * 4);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
+        matr_c[i * N + j] = (i + 1) * 4;
       }
     }
     double* matr_add4 = Add4(matr_a, matr_a, matr_b, matr_b, N);
@@ -125,8 +125,8 @@ TEST(strassen_algm_for_matrix, check_func_Sub_two_matrix) {
 
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
         matr_c[i * N + j] = 0;
       }
     }
@@ -148,9 +148,9 @@ TEST(strassen_algm_for_matrix, check_func_Add_three_Sub_one_matrix) {
 
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        matr_a[i * N + j] = ((double)i + 1);
-        matr_b[i * N + j] = ((double)i + 1);
-        matr_c[i * N + j] = (((double)i + 1) * 3);
+        matr_a[i * N + j] = i + 1;
+        matr_b[i * N + j] = i + 1;
+        matr_c[i * N + j] = (i + 1) * 2;
       }
     }
     double* matr_add3sub1 = Add3Sub1(matr_a, matr_a, matr_b, matr_b, N);
