@@ -1,10 +1,10 @@
 // Copyright 2019 Zhbanova Nadezhda
 
-#include "../../../modules/task_3/zhbanova_n_strassen_algm_for_matrix/strassen_algm_for_matrix.h"
-#include "./mpi.h"
 #include <iostream>
 #include <math.h>
 #include <time.h>
+#include "../../../modules/task_3/zhbanova_n_strassen_algm_for_matrix/strassen_algm_for_matrix.h"
+#include "./mpi.h"
 
 double* MemoryVectorMatrix(int N) {
   int N_N = N * N;
@@ -16,7 +16,7 @@ void RandMatrix(double* matrix1, int N) {
   srand(time(0));
   for (int i = 0; i < N; i++)
     for (int j = 0; j < N; j++) {
-      matrix1[i * N + j] = (rand() % 10) + 0.5;
+      matrix1[i * N + j] = rand() % 10;
     }
 }
 
