@@ -71,7 +71,6 @@ double* Add3Sub1(double* matrix1, double* matrix2, double* matrix3, double* matr
   for (int i = 0; i < N; i++)
     for (int j = 0; j < N; j++)
       Rez[i * N + j] = matrix1[i * N + j] + matrix2[i * N + j] + matrix3[i * N + j] - matrix4[i * N + j];
-
   return Rez;
 }
 
@@ -118,15 +117,15 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
     TMP = Add2(A[2], A[3], N);
     P[1] = Strassen_alg(TMP, B[0], N);
     delete[] TMP;
-  
+
     TMP = Sub2(B[1], B[3], N);
     P[2] = Strassen_alg(A[0], TMP, N);
     delete[] TMP;
-  
+
     TMP = Sub2(B[2], B[0], N);
     P[3] = Strassen_alg(A[3], TMP, N);
     delete[] TMP;
-  
+
     TMP = Add2(A[0], A[1], N);
     P[4] = Strassen_alg(TMP, B[3], N);
     delete[] TMP;
@@ -136,13 +135,13 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
     P[5] = Strassen_alg(TMP, _TMP, N);
     delete[] TMP;
     delete[] _TMP;
-  
+
     TMP = Sub2(A[1], A[3], N);
     _TMP = Add2(B[2], B[3], N);
     P[6] = Strassen_alg(TMP, _TMP, N);
     delete[] TMP;
     delete[] _TMP;
-  
+
     /*Находим результирующие значения(блоки)*/
     C[0] = Add3Sub1(P[0], P[3], P[6], P[4], N);
     C[1] = Add2(P[2], P[4], N);
@@ -156,7 +155,7 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
         Rez[i * 2 * N + j + 2 * N * N] = C[2][i * N + j];
         Rez[i * 2 * N + j + 2 * N * N + N] = C[3][i * N + j];
       }
-  
+
     /*Освобождаем выделенную память*/
     for (int i = 0; i < 4; i++) {
       delete[] A[i];
@@ -170,130 +169,109 @@ double* Strassen_alg(double* matrix1, double* matrix2, int N) {
 }
 
 double* Strassen_alg_parall(double* matr_A, double* matr_B, int N) {
-	double * matr_Rez_Par, ** A, ** B, ** TMP_Rez;
-	int sqr, new_N;
-	int size, rank;
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Status Status;
+  double * matr_Rez_Par, ** A, ** B, ** TMP_Rez;
+  int sqr, new_N;
+  int size, rank;
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Status Status;
 
-	if (N <= 64) {
-		return matr_Rez_Par = Strassen_alg(matr_A, matr_B, N);
-	}
-	if (rank == 0) {
-		matr_Rez_Par = MemoryVectorMatrix(N);
-
-		/*Выделение памяти под вспомогательные матрицы и разбиение матриц на блоки*/
-		sqr = (int)sqrt((double)size), new_N = N / sqr;
-		A = new double* [size], B = new double* [size];
-
-
-		for (int i = 0; i < size; i++) {
-			A[i] = MemoryVectorMatrix(new_N);
-			B[i] = MemoryVectorMatrix(new_N);
-		}
-
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < N; j++) {
-				A[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_A[i * N + j];
-				B[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_B[i * N + j];
-			}
-
-		/*Рассылка данных другим процессам*/
-		MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
-		
-
-		for (int i = 1; i < size; i++) {
-			int coef_A = sqr * (i / sqr), coef_B = i % sqr;
-			for (int j = 0; j < sqr; j++) {
-				MPI_Send(A[coef_A], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-				MPI_Send(B[coef_B], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-				coef_A++;
-				coef_B += sqr;
-			}
-		}
-		///*Swap указателей для однообразных вычислений*/
-		for (int i = 0; i < sqr; i++) {
-			double* TMP = B[i];
-			B[i] = B[i * sqr];
-			B[i * sqr] = TMP;
-		}
-	}
-	/*Прием данных от процесса-root и формировка нужных данных */
-	if (size != 0) {
-		MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
-		sqr = (int)sqrt((double)size), new_N = N / sqr;
-
-		A = new double* [sqr], B = new double* [sqr];
-		for (int i = 0; i < sqr; i++) {
-			A[i] = MemoryVectorMatrix(new_N);
-			B[i] = MemoryVectorMatrix(new_N);
-		}
-
-		for (int i = 0; i < sqr; i++) {
-			MPI_Recv(A[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
-			MPI_Recv(B[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
-
-		}
-	}
-
-	///*вычисление каждым процессом своего куска матрицы*/
-	TMP_Rez = new double* [sqr+1];
-	for ( int i = 0; i < sqr; i++) {
-		TMP_Rez[i + 1] = Strassen_alg(A[i], B[i], new_N);
-	}
-	if (size == 4)
-		TMP_Rez[0] = Add2(TMP_Rez[1], TMP_Rez[2], new_N);
-	if (size == 16)
-		TMP_Rez[0] = Add4(TMP_Rez[1], TMP_Rez[2], TMP_Rez[3], TMP_Rez[4], new_N);
-
-
-	///*Освобождение вспомогательной памяти*/
-	if (rank == 0) {
-		for (int i = 0; i < size; i++) {
-			delete[] A[i];
-			delete[] B[i];
-		}
-	}
-	else {
-		for (int i = 0; i < sqr; i++) {
-			delete[] A[i];
-			delete[] B[i];
-		}
-	}
-	for (int i = 1; i < sqr + 1; i++) {
-		delete[] TMP_Rez[i];
-	}
-	delete[] A;
-	delete[] B;
-
-
-	///*Отправка результата на 0 процесс*/
-	if (rank != 0) {
-		MPI_Send(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-		delete[] TMP_Rez[0];
-	}
-
-
-	if (rank == 0) {
-		int coef = (int)sqrt((double)size);
-		/*записываем результат совей работы*/
-		for (int i = 0; i < new_N; i++)
-			for (int j = 0; j < new_N; j++)
-				matr_Rez_Par[coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
-		PrintMatrix(matr_Rez_Par, N);
-		for (int k = 1; k < size; k++) {
-			/*принимаем и записываем результаты работы других процессов*/
-			MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
-
-			for (int i = 0; i < new_N; i++)
-				for (int j = 0; j < new_N; j++)
-					matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
-		}
-		return matr_Rez_Par;
-		delete[] TMP_Rez[0];
-		delete[] matr_Rez_Par;
-	}
-
-	delete[] TMP_Rez;
+  if (N <= 64) {
+    return matr_Rez_Par = Strassen_alg(matr_A, matr_B, N);
+  }
+  if (rank == 0) {
+    matr_Rez_Par = MemoryVectorMatrix(N);
+    //  Выделение памяти под вспомогательные матрицы и разбиение матриц на блоки
+    sqr = (int)sqrt((double)size), new_N = N / sqr;
+    A = new double* [size], B = new double* [size];
+    for (int i = 0; i < size; i++) {
+      A[i] = MemoryVectorMatrix(new_N);
+      B[i] = MemoryVectorMatrix(new_N);
+    }
+    for (int i = 0; i < N; i++)
+      for (int j = 0; j < N; j++) {
+        A[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_A[i * N + j];
+        B[sqr * (i / new_N) + j / new_N][(i % new_N) * new_N + (j % new_N)] = matr_B[i * N + j];
+      }
+    //  Рассылка данных другим процессам
+    MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    for (int i = 1; i < size; i++) {
+      int coef_A = sqr * (i / sqr), coef_B = i % sqr;
+      for (int j = 0; j < sqr; j++) {
+        MPI_Send(A[coef_A], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+        MPI_Send(B[coef_B], new_N * new_N, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+        coef_A++;
+        coef_B += sqr;
+      }
+    }
+    //  Swap указателей для однообразных вычислений
+    for (int i = 0; i < sqr; i++) {
+      double* TMP = B[i];
+      B[i] = B[i * sqr];
+      B[i * sqr] = TMP;
+    }
+  }
+  //  Прием данных от процесса-root и формировка нужных данных
+  if (size != 0) {
+    MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    sqr = (int)sqrt((double)size), new_N = N / sqr;
+    A = new double* [sqr], B = new double* [sqr];
+    for (int i = 0; i < sqr; i++) {
+      A[i] = MemoryVectorMatrix(new_N);
+      B[i] = MemoryVectorMatrix(new_N);
+    }
+    for (int i = 0; i < sqr; i++) {
+      MPI_Recv(A[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
+      MPI_Recv(B[i], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &Status);
+    }
+  }
+  //  вычисление каждым процессом своего куска матрицы
+  TMP_Rez = new double* [sqr+1];
+  for ( int i = 0; i < sqr; i++) {
+    TMP_Rez[i + 1] = Strassen_alg(A[i], B[i], new_N);
+  }
+  if (size == 4)
+    TMP_Rez[0] = Add2(TMP_Rez[1], TMP_Rez[2], new_N);
+  if (size == 16)
+    TMP_Rez[0] = Add4(TMP_Rez[1], TMP_Rez[2], TMP_Rez[3], TMP_Rez[4], new_N);
+  //  Освобождение вспомогательной памяти
+  if (rank == 0) {
+    for (int i = 0; i < size; i++) {
+      delete[] A[i];
+      delete[] B[i];
+    }
+  } else {
+    for (int i = 0; i < sqr; i++) {
+      delete[] A[i];
+      delete[] B[i];
+    }
+  }
+  for (int i = 1; i < sqr + 1; i++) {
+    delete[] TMP_Rez[i];
+  }
+  delete[] A;
+  delete[] B;
+  //  Отправка результата на 0 процесс
+  if (rank != 0) {
+    MPI_Send(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+    delete[] TMP_Rez[0];
+  }
+  if (rank == 0) {
+    int coef = (int)sqrt((double)size);
+    //  записываем результат совей работы
+    for (int i = 0; i < new_N; i++)
+      for (int j = 0; j < new_N; j++)
+        matr_Rez_Par[coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+    for (int k = 1; k < size; k++) {
+      //  принимаем и записываем результаты работы других процессов
+      MPI_Recv(TMP_Rez[0], new_N * new_N, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, &Status);
+      for (int i = 0; i < new_N; i++)
+        for (int j = 0; j < new_N; j++)
+          matr_Rez_Par[(k / coef) * new_N * N + (k % coef) * new_N + coef * i * new_N + j] = TMP_Rez[0][i * new_N + j];
+    }
+    return matr_Rez_Par;
+    delete[] TMP_Rez[0];
+    delete[] matr_Rez_Par;
+  }
+  delete[] TMP_Rez;
 }

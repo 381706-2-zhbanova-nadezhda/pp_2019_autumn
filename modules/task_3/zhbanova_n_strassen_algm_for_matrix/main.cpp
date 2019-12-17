@@ -32,7 +32,7 @@ TEST(strassen_algm_for_matrix, check_Strassen_algorithm) {
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   if (size < 2) {
-    int N = (int)pow(2.0, 2);
+    int N = 4;
     double* matr_A = MemoryVectorMatrix(N);
     double* matr_B = MemoryVectorMatrix(N);
     RandMatrix(matr_A, N);
